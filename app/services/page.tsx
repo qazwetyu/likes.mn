@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { useRouter } from 'next/navigation';
 
 const services = [
   {
@@ -35,7 +34,6 @@ const services = [
 ];
 
 export default function Services() {
-  const router = useRouter();
   const [selectedService, setSelectedService] = useState(services[0]);
   const [selectedPackage, setSelectedPackage] = useState<null | { amount: number; price: number }>(null);
   const [username, setUsername] = useState("");
