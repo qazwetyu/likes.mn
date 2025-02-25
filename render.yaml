@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: likes-mn
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  - type: cron
+    name: check-orders
+    schedule: "*/5 * * * *"
+    command: curl https://your-app.onrender.com/api/cron/check-orders 

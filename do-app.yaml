@@ -1,0 +1,19 @@
+name: likes-mn
+services:
+  - name: web
+    github:
+      branch: main
+      deploy_on_push: true
+    build_command: npm run build
+    run_command: npm start
+    envs:
+      - key: NODE_ENV
+        value: production
+
+jobs:
+  - name: check-orders
+    git:
+      branch: main
+      repo_clone_url: https://github.com/username/likes-mn.git
+    run_command: curl http://localhost:3000/api/cron/check-orders
+    schedule: "*/5 * * * *" 

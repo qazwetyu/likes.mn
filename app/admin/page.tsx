@@ -2,6 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import OrderModal from './components/OrderModal';
+import { db } from '@/lib/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import OrderTracker from './components/OrderTracker';
 
 interface Order {
   id: string;
@@ -19,27 +23,22 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    fetchOrders();
-    // Set up polling for new orders
-    const interval = setInterval(fetchOrders, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch('/api/admin/orders');
-      const data = await response.json();
-      if (data.success) {
-        setOrders(data.orders);
-      }
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
+    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const orders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setOrders(orders);
       setLoading(false);
-    }
-  };
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -64,6 +63,28 @@ export default function AdminDashboard() {
     return matchesSearch && matchesStatus && matchesDate;
   });
 
+  const handleUpdateStatus = async (status: string) => {
+    if (!selectedOrder) return;
+
+    try {
+      const response = await fetch(`/api/admin/orders/${selectedOrder.id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setOrders(orders.map(order => 
+          order.id === selectedOrder.id ? { ...order, status } : order
+        ));
+        setSelectedOrder(null);
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
   return (
     <div>
       <div className="md:flex md:items-center md:justify-between mb-8">
@@ -73,6 +94,8 @@ export default function AdminDashboard() {
           </h2>
         </div>
       </div>
+
+      <OrderTracker />
 
       <div className="mb-6 space-y-4">
         <div className="flex gap-4">
@@ -175,7 +198,8 @@ export default function AdminDashboard() {
                   key={order.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-gray-50"
+                  onClick={() => setSelectedOrder(order)}
+                  className="hover:bg-gray-50 cursor-pointer"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {order.id}
@@ -206,6 +230,12 @@ export default function AdminDashboard() {
           </table>
         </div>
       )}
+
+      <OrderModal
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        onUpdateStatus={handleUpdateStatus}
+      />
     </div>
   );
 } 

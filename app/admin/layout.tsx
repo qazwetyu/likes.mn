@@ -1,4 +1,9 @@
+"use client";
+
 import { Inter } from "next/font/google";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../src/contexts/AuthContext";
+import { auth } from "@/src/lib/firebase";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -8,6 +13,27 @@ export default function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      router.push('/admin/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    router.push('/admin/login');
+    return null;
+  }
+
   return (
     <div className={`min-h-screen bg-gray-50 ${inter.className}`}>
       <nav className="bg-white shadow-sm border-b">
@@ -17,6 +43,15 @@ export default function AdminLayout({
               <span className="text-2xl font-bold text-gradient">
                 likes.mn - Админ
               </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-gray-600">{user.email}</span>
+              <button
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Гарах
+              </button>
             </div>
           </div>
         </div>
