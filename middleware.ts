@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verify } from 'jsonwebtoken';
+import { verifyToken } from '@/lib/utils/jwt';
 
 export const config = {
   matcher: ['/admin/:path*'],
   runtime: 'nodejs'
 };
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function middleware(request: NextRequest) {
   try {
@@ -18,11 +16,9 @@ export async function middleware(request: NextRequest) {
     if (isAdminPath) {
       if (isLoginPath) {
         if (token) {
-          try {
-            verify(token, JWT_SECRET);
+          const verified = verifyToken(token);
+          if (verified) {
             return NextResponse.redirect(new URL('/admin', request.url));
-          } catch {
-            return NextResponse.next();
           }
         }
         return NextResponse.next();
@@ -32,12 +28,11 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/admin/login', request.url));
       }
 
-      try {
-        verify(token, JWT_SECRET);
+      const verified = verifyToken(token);
+      if (verified) {
         return NextResponse.next();
-      } catch {
-        return NextResponse.redirect(new URL('/admin/login', request.url));
       }
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
     return NextResponse.next();

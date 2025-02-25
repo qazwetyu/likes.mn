@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { sign } from 'jsonwebtoken';
+import { createToken } from '@/lib/utils/jwt';
 
 export const runtime = 'nodejs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
@@ -14,7 +13,7 @@ export async function POST(req: Request) {
     const { username, password } = body;
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      const token = sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+      const token = createToken({ username });
       
       cookies().set('admin_token', token, {
         httpOnly: true,

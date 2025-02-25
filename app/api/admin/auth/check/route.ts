@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verify } from 'jsonwebtoken';
+import { verifyToken } from '@/lib/utils/jwt';
 
 export const runtime = 'nodejs';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function GET() {
   try {
@@ -14,8 +12,10 @@ export async function GET() {
       return NextResponse.json({ isAuthenticated: false }, { status: 401 });
     }
 
-    verify(token, JWT_SECRET);
-    return NextResponse.json({ isAuthenticated: true });
+    const verified = verifyToken(token);
+    return NextResponse.json({ 
+      isAuthenticated: Boolean(verified) 
+    });
 
   } catch (error) {
     return NextResponse.json({ isAuthenticated: false }, { status: 401 });
