@@ -26,7 +26,10 @@
   "crons": [
     {
       "path": "/api/cron/check-orders",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 0 * * *"
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs"
 } 

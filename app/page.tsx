@@ -5,6 +5,7 @@ import { ShieldCheckIcon, BoltIcon, HeartIcon, UserGroupIcon } from "@heroicons/
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Footer from "./components/Footer";
+import Image from 'next/image';
 
 // Animation variants for staggered animations
 const containerVariants = {
@@ -12,7 +13,7 @@ const containerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2
+      staggerChildren: 0.1
     }
   }
 };
@@ -26,11 +27,11 @@ export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Add automatic animation every 3 seconds
+  // Add automatic animation every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setIsAnimating(prev => !prev);
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -94,9 +95,12 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-6 items-start">
             {/* Image - increased mobile height */}
             <div className="relative h-[350px] md:h-[400px] rounded-2xl overflow-hidden bg-gray-100 shadow-inner">
-              <img 
+              <Image 
                 src="/flag-review.png" 
                 alt="Instagram Flag Review Setting" 
+                width={800}
+                height={600}
+                priority
                 className="object-cover w-full h-full"
               />
             </div>
@@ -242,7 +246,7 @@ export default function Home() {
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-200px" }}
+          viewport={{ once: true }}
           className="max-w-6xl mx-auto"
         >
           <motion.h2 
@@ -308,7 +312,6 @@ export default function Home() {
               {
                 name: "Ганзаяа",
                 username: "хэрэглэгч нуухыг хүссэн",
-                // image: "/testimonials/user1.jpg",
                 rating: 5,
                 review: "Миний дагагч 1000аас хэтэрчихлээ бүр санаа зовоод байна шүү",
                 service: "1000 Дагагч",
@@ -317,7 +320,6 @@ export default function Home() {
               {
                 name: "Сарнай",
                 username: "хэрэглэгч нуухыг хүссэн",
-                // image: "/testimonials/user2.jpg",
                 rating: 5,
                 review: "Ёстой хурдан ордог юм байна аа.",
                 service: "3000 Дагагч",
@@ -326,7 +328,6 @@ export default function Home() {
               {
                 name: "***onlineshop",
                 username: "хэрэглэгч нуухыг хүссэн",
-                // image: "/testimonials/user3.jpg",
                 rating: 5,
                 review: "Итгэхгүй байсан яг нэмэгддэг юм байна аа onlineshop дээрээ авлаа",
                 service: "5000 Лайк",
@@ -339,8 +340,10 @@ export default function Home() {
                 className="glass-card rounded-2xl p-6 hover:shadow-xl transition-all"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 p-[2px]">
-                   
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+                    <span className="text-xl font-bold text-white">
+                      {testimonial.name[0]}
+                    </span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{testimonial.name}</h3>
@@ -375,7 +378,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Replace the footer with the new component */}
+      {/* Footer */}
       <Footer />
     </div>
   );

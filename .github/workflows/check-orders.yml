@@ -1,0 +1,13 @@
+name: Check Orders
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  check-orders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Orders Status
+        run: |
+          curl -X GET ${{ secrets.APP_URL }}/api/cron/check-orders 

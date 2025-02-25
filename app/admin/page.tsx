@@ -3,18 +3,21 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import OrderModal from './components/OrderModal';
-import { db } from '@/lib/firebase';
+import { db } from '@/src/lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import OrderTracker from './components/OrderTracker';
 
 interface Order {
   id: string;
-  service: string;
+  service: 'followers' | 'likes';
   amount: number;
   price: number;
   username: string;
-  status: string;
+  status: 'pending' | 'paid' | 'processing' | 'completed' | 'failed';
   createdAt: string;
+  updatedAt: string;
+  bylPaymentId?: string;
+  smmOrderId?: string;
 }
 
 export default function AdminDashboard() {
@@ -32,7 +35,8 @@ export default function AdminDashboard() {
       const orders = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })) as Order[];
+      
       setOrders(orders);
       setLoading(false);
     });
@@ -63,7 +67,7 @@ export default function AdminDashboard() {
     return matchesSearch && matchesStatus && matchesDate;
   });
 
-  const handleUpdateStatus = async (status: string) => {
+  const handleUpdateStatus = async (status: Order['status']) => {
     if (!selectedOrder) return;
 
     try {
@@ -76,7 +80,7 @@ export default function AdminDashboard() {
       const data = await response.json();
       if (data.success) {
         setOrders(orders.map(order => 
-          order.id === selectedOrder.id ? { ...order, status } : order
+          order.id === selectedOrder.id ? { ...order, status: status as Order['status'] } : order
         ));
         setSelectedOrder(null);
       }

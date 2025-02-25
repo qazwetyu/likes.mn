@@ -2,20 +2,20 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        punycode: false,
-        querystring: false,
-        url: false,
-        string_decoder: false,
-        buffer: false,
-        timers: false
-      };
-    }
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+      punycode: false
+    };
     return config;
   },
+  experimental: {
+    serverComponentsExternalPackages: ['jsonwebtoken', 'firebase-admin']
+  }
 }
 
 module.exports = nextConfig 

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { sign } from 'jsonwebtoken';
 
+export const runtime = 'nodejs';
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;

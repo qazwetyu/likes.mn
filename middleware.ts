@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verify } from 'jsonwebtoken';
 
+export const config = {
+  matcher: ['/admin/:path*'],
+  runtime: 'nodejs'
+};
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function middleware(request: NextRequest) {
@@ -40,8 +45,4 @@ export async function middleware(request: NextRequest) {
     console.error('Middleware error:', error);
     return NextResponse.next();
   }
-}
-
-export const config = {
-  matcher: ['/admin/:path*']
-}; 
+} 

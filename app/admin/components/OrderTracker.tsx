@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore';
+
+interface Order {
+  id: string;
+  service: string;
+  amount: number;
+  price: number;
+  username: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  createdAt: string;
+}
 
 interface OrderStats {
   total: number;
@@ -10,7 +20,7 @@ interface OrderStats {
   processing: number;
   completed: number;
   failed: number;
-  recentOrders: any[];
+  recentOrders: Order[];
 }
 
 export default function OrderTracker() {
@@ -24,14 +34,16 @@ export default function OrderTracker() {
   });
 
   useEffect(() => {
-    // Get all orders for stats
     const ordersQuery = query(
       collection(db, 'orders'),
       orderBy('createdAt', 'desc')
     );
 
     const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
-      const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const orders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Order[];
       
       setStats({
         total: orders.length,
@@ -39,7 +51,7 @@ export default function OrderTracker() {
         processing: orders.filter(order => order.status === 'processing').length,
         completed: orders.filter(order => order.status === 'completed').length,
         failed: orders.filter(order => order.status === 'failed').length,
-        recentOrders: orders.slice(0, 5) // Get 5 most recent orders
+        recentOrders: orders.slice(0, 5)
       });
     });
 

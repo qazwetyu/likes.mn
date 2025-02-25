@@ -4,18 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface Order {
   id: string;
-  service: string;
+  service: 'followers' | 'likes';
   amount: number;
   price: number;
   username: string;
-  status: string;
+  status: 'pending' | 'paid' | 'processing' | 'completed' | 'failed';
   createdAt: string;
+  updatedAt: string;
+  bylPaymentId?: string;
+  smmOrderId?: string;
 }
 
 interface OrderModalProps {
   order: Order | null;
   onClose: () => void;
-  onUpdateStatus: (status: string) => Promise<void>;
+  onUpdateStatus: (status: Order['status']) => Promise<void>;
 }
 
 export default function OrderModal({ order, onClose, onUpdateStatus }: OrderModalProps) {
@@ -68,7 +71,7 @@ export default function OrderModal({ order, onClose, onUpdateStatus }: OrderModa
               <label className="text-sm text-gray-500">Төлөв</label>
               <select
                 value={order.status}
-                onChange={(e) => onUpdateStatus(e.target.value)}
+                onChange={(e) => onUpdateStatus(e.target.value as Order['status'])}
                 className="form-select"
               >
                 <option value="pending">Хүлээгдэж буй</option>

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "../src/contexts/AuthContext";
+import { AuthProvider } from "@/src/contexts/AuthContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "likes.mn - Instagram Growth Services",

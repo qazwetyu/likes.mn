@@ -7,8 +7,7 @@ import { createNotification } from '@/src/lib/services/notifications';
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { token, orderId } = body;
+    const { token, orderId } = await req.json();
 
     // Verify byl.mn payment with retry
     const paymentVerification = await withRetry(
@@ -24,7 +23,10 @@ export async function POST(req: Request) {
         throw new Error('Order not found');
       }
 
-      const order = orderDoc.data();
+      const orderData = orderDoc.data();
+      if (!orderData) {
+        throw new Error('Order data is empty');
+      }
 
       // Create notification for successful payment
       await createNotification(
@@ -36,9 +38,9 @@ export async function POST(req: Request) {
       // Create SMM Raja order with retry
       const smmOrder = await withRetry(
         () => createSMMOrder({
-          service: order.service === 'followers' ? SMM_SERVICES.FOLLOWERS : SMM_SERVICES.LIKES,
-          link: order.username,
-          quantity: order.amount
+          service: orderData.service === 'followers' ? SMM_SERVICES.FOLLOWERS : SMM_SERVICES.LIKES,
+          link: orderData.username,
+          quantity: orderData.amount
         }),
         { maxAttempts: 3, delay: 2000 }
       );
@@ -66,12 +68,14 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Callback processing error:', error);
     
+    const reqBody = await req.json().catch(() => ({}));
+    
     // Create notification for processing error
-    if (body?.orderId) {
+    if (reqBody?.orderId) {
       await createNotification(
         'payment_failed',
-        body.orderId,
-        `Error processing payment for order ${body.orderId}`
+        reqBody.orderId,
+        `Error processing payment for order ${reqBody.orderId}`
       );
     }
 

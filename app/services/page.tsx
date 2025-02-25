@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import { db } from '@/src/lib/firebase';
 
 const services = [
   {
