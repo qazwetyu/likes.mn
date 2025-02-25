@@ -6,7 +6,11 @@ import { useAuth } from "../../src/contexts/AuthContext";
 import { auth } from "@/src/lib/firebase";
 import "../globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  weight: ['400', '500', '600', '700']
+});
 
 export default function AdminLayout({
   children,
